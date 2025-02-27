@@ -1,6 +1,12 @@
 import React from "react";
 import CookieConsent from "react-cookie-consent";
 
+/**
+ * Компонент CookiePopup відображає спливаюче вікно для згоди користувача на використання файлів cookie.
+ * @component
+ * @returns {JSX.Element} JSX-розмітка компонента CookiePopup.
+ */
+
 const CookiePopup = () => {
     return (
         <CookieConsent

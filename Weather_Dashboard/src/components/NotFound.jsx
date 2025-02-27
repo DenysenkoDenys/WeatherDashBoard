@@ -1,6 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./style/NotFound.css";
+import "../style/NotFound.css   ";
+
+/**
+ * Компонент NotFound відображає сторінку 404, коли користувач переходить на неіснуючу сторінку.
+ * @component
+ * @returns {JSX.Element} JSX-розмітка компонента NotFound.
+ */
 
 const NotFound = () => {
     return (

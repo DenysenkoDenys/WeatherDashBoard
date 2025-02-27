@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
+import "./style/WeatherDashboard.css";
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,7 +12,7 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import "./style/WeatherDashboard.css";
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 ChartJS.register(
     CategoryScale,
@@ -22,6 +24,11 @@ ChartJS.register(
     Legend
 );
 
+/**
+ * Компонент WeatherDashboard для відображення інформації про погоду.
+ * @component
+ * @returns {JSX.Element} JSX-розмітка компоненту.
+ */
 const WeatherDashboard = () => {
     const [city, setCity] = useState("");
     const [weather, setWeather] = useState(null);
@@ -29,6 +36,13 @@ const WeatherDashboard = () => {
     const [hourlyForecast, setHourlyForecast] = useState([]);
     const [error, setError] = useState("");
 
+    /**
+     * Отримує погодні дані для вказаного міста.
+     * @async
+     * @function fetchWeather
+     * @throws {Error} Якщо місто не вказано або виникає помилка під час запиту.
+     * @returns {Promise<void>} Нічого не повертає, але оновлює стан погоди.
+     */
     const fetchWeather = async () => {
         if (!city) {
             setError("Будь ласка, введіть місто");
@@ -55,12 +69,39 @@ const WeatherDashboard = () => {
         }
     };
 
+    /**
+     * Викликає fetchWeather() при натисканні клавіші Enter в полі введення.
+     * @function handleKeyPress
+     * @param {KeyboardEvent} e - Об'єкт події клавіатури.
+     */
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
             fetchWeather();
         }
     };
 
+    /**
+     * Перенаправляє користувача на сторінку політики конфіденційності.
+     * @function handlePrivacyPolicyClick
+     */
+    const handlePrivacyPolicyClick = () => {
+        window.location.href = "/privacy-policy";
+    };
+
+    /**
+     * Видаляє кукі згоди користувача та перезавантажує сторінку.
+     * @function handleUpdateCookiesClick
+     */
+    const handleUpdateCookiesClick = () => {
+        document.cookie = "userConsent=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.reload();
+    };
+
+    /**
+     * Генерує дані для графіка на основі прогнозу погоди.
+     * @function getChartData
+     * @returns {Object} Об'єкт з даними для графіка, включаючи labels та datasets.
+     */
     const getChartData = () => {
         if (!hourlyForecast || !Array.isArray(hourlyForecast)) {
             console.log("hourlyForecast не валідний або не є масивом:", hourlyForecast);
@@ -99,7 +140,6 @@ const WeatherDashboard = () => {
         return chartData;
     };
 
-
     return (
         <div className="container">
             <h1>Прогноз погоди</h1>
@@ -135,7 +175,6 @@ const WeatherDashboard = () => {
                     <h2>Прогноз на наступні 9 годин</h2>
                     <div className="chart-container">
                         <Line data={getChartData()} />
-
                     </div>
                 </div>
             )}
@@ -158,6 +197,42 @@ const WeatherDashboard = () => {
                     </div>
                 </div>
             )}
+
+            <button
+                onClick={handlePrivacyPolicyClick}
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    right: "20px",
+                    padding: "10px 20px",
+                    background: "#2B373B",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                }}
+            >
+                Переглянути політику конфіденційності
+            </button>
+
+            <button
+                onClick={handleUpdateCookiesClick}
+                style={{
+                    position: "fixed",
+                    bottom: "70px",
+                    right: "20px",
+                    padding: "10px 20px",
+                    background: "#2B373B",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                }}
+            >
+                Оновити налаштування кукі
+            </button>
         </div>
     );
 };

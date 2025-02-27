@@ -71,3 +71,13 @@ button:hover {
     border-radius: 5px;
     width: 18%;
 }
+button {
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3a4a4f !important;
+}
+.forecast-chart {
+    margin-top: 20px;
+}
