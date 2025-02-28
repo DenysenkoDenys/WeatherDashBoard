@@ -16,12 +16,12 @@ const CookiePopup = () => {
             enableDeclineButton
             cookieName="userConsent"
             style={{ background: "#2B373B" }}
-            buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
-            declineButtonStyle={{ color: "#fff", fontSize: "13px", background: "#d9534f" }}
+            buttonStyle={{ color: "#fff", fontSize: "14px", background: "#28a745", borderRadius: "5px", padding: "10px 20px" }}
+            declineButtonStyle={{ color: "#fff", fontSize: "14px", background: "#dc3545", borderRadius: "5px", padding: "10px 20px" }}
             expires={150}
         >
             Ми використовуємо файли cookie для покращення вашого досвіду. Приймаючи, ви погоджуєтесь із нашою{" "}
-            <a href="/privacy-policy" style={{ color: "#FFD700" }}>
+            <a href="/privacy-policy" style={{ color: "#FFD700", textDecoration: "underline" }}>
                 політикою конфіденційності
             </a>
             .

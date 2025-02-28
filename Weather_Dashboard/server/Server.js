@@ -1,12 +1,16 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
 
 const app = express();
 const PORT = 5000;
 const API_KEY = "e40784deb4efbf369e1c64d13aeefdcd";
 
 app.use(cors());
+const swaggerDocument = JSON.parse(fs.readFileSync("swagger.json", "utf8"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/api/weather", async (req, res) => {
     let city = req.query.city;

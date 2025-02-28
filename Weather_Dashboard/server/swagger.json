@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Weather API",
+    "version": "1.0.0",
+    "description": "API для отримання погоди та прогнозу."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Локальний сервер"
+    }
+  ],
+  "paths": {
+    "/api/weather": {
+      "get": {
+        "summary": "Отримати поточну погоду та прогноз",
+        "description": "Повертає поточну температуру, прогноз на 9 годин та 5 днів.",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "required": true,
+            "description": "Назва міста для отримання погоди.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішна відповідь",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "city": { "type": "string" },
+                    "temperature": { "type": "integer" },
+                    "description": { "type": "string" },
+                    "humidity": { "type": "integer" },
+                    "windSpeed": { "type": "number" },
+                    "icon": { "type": "string" },
+                    "hourlyForecast": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "time": { "type": "string" },
+                          "temperature": { "type": "integer" }
+                        }
+                      }
+                    },
+                    "forecast": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": { "type": "string" },
+                          "temperature": { "type": "integer" },
+                          "description": { "type": "string" },
+                          "icon": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некоректний запит"
+          },
+          "500": {
+            "description": "Внутрішня помилка сервера"
+          }
+        }
+      }
+    },
+    "/api/forecast": {
+      "get": {
+        "summary": "Отримати прогноз на 5 днів",
+        "description": "Повертає 5-денний прогноз для міста.",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "required": true,
+            "description": "Назва міста для отримання прогнозу.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішна відповідь",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": { "type": "string" },
+                      "temperature": { "type": "integer" },
+                      "description": { "type": "string" },
+                      "icon": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некоректний запит"
+          },
+          "500": {
+            "description": "Внутрішня помилка сервера"
+          }
+        }
+      }
+    }
+  }
+}

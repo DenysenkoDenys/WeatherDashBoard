@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: WeatherDashboard.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: WeatherDashboard.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react";
+import { Line } from "react-chartjs-2";
+import "./style/WeatherDashboard.css";
+
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+/**
+ * Компонент WeatherDashboard для відображення інформації про погоду.
+ * @component
+ * @returns {JSX.Element} JSX-розмітка компоненту.
+ */
+const WeatherDashboard = () => {
+    const [city, setCity] = useState("");
+    const [weather, setWeather] = useState(null);
+    const [forecast, setForecast] = useState(null);
+    const [hourlyForecast, setHourlyForecast] = useState([]);
+    const [error, setError] = useState("");
+
+    /**
+     * Отримує погодні дані для вказаного міста.
+     * @async
+     * @function fetchWeather
+     * @throws {Error} Якщо місто не вказано або виникає помилка під час запиту.
+     * @returns {Promise&lt;void>} Нічого не повертає, але оновлює стан погоди.
+     */
+    const fetchWeather = async () => {
+        if (!city) {
+            setError("Будь ласка, введіть місто");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/weather?city=${city}`);
+
+            if (!response.ok) {
+                throw new Error("Не вдалося отримати погоду");
+            }
+
+            const data = await response.json();
+            setWeather(data);
+            setForecast(data.forecast || []);
+            setHourlyForecast(data.hourlyForecast || []);
+            setError("");
+        } catch (err) {
+            setError(err.message);
+            setWeather(null);
+            setForecast(null);
+            setHourlyForecast([]);
+        }
+    };
+
+    /**
+     * Викликає fetchWeather() при натисканні клавіші Enter в полі введення.
+     * @function handleKeyPress
+     * @param {KeyboardEvent} e - Об'єкт події клавіатури.
+     */
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            fetchWeather();
+        }
+    };
+
+    /**
+     * Перенаправляє користувача на сторінку політики конфіденційності.
+     * @function handlePrivacyPolicyClick
+     */
+    const handlePrivacyPolicyClick = () => {
+        window.location.href = "/privacy-policy";
+    };
+
+    /**
+     * Видаляє кукі згоди користувача та перезавантажує сторінку.
+     * @function handleUpdateCookiesClick
+     */
+    const handleUpdateCookiesClick = () => {
+        document.cookie = "userConsent=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.reload();
+    };
+
+    /**
+     * Генерує дані для графіка на основі прогнозу погоди.
+     * @function getChartData
+     * @returns {Object} Об'єкт з даними для графіка, включаючи labels та datasets.
+     */
+    const getChartData = () => {
+        if (!hourlyForecast || !Array.isArray(hourlyForecast)) {
+            console.log("hourlyForecast не валідний або не є масивом:", hourlyForecast);
+            return {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Температура (°C)",
+                        data: [],
+                        borderColor: "rgba(75,192,192,1)",
+                        fill: false,
+                    },
+                ],
+            };
+        }
+
+        console.log("hourlyForecast:", hourlyForecast);
+
+        const labels = hourlyForecast.map(data => data.time);
+        const temperatures = hourlyForecast.map(data => data.temperature);
+
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Температура (°C)",
+                    data: temperatures,
+                    borderColor: "rgba(75,192,192,1)",
+                    fill: false,
+                },
+            ],
+        };
+
+        console.log("Chart Data:", chartData);
+
+        return chartData;
+    };
+
+    return (
+        &lt;div className="container">
+            &lt;h1>Прогноз погоди&lt;/h1>
+            &lt;div className="search-container">
+                &lt;input
+                    type="text"
+                    placeholder="Введіть місто"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                />
+                &lt;button onClick={fetchWeather}>Отримати погоду&lt;/button>
+            &lt;/div>
+
+            {error &amp;&amp; &lt;p className="error">{error}&lt;/p>}
+
+            {weather &amp;&amp; (
+                &lt;div className="weather-info">
+                    &lt;h2>{weather.city}&lt;/h2>
+                    &lt;img
+                        src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                        alt={weather.description}
+                    />
+                    &lt;p>Температура: {weather.temperature}°C&lt;/p>
+                    &lt;p>Опис: {weather.description}&lt;/p>
+                    &lt;p>Вологість: {weather.humidity}%&lt;/p>
+                    &lt;p>Швидкість вітру: {weather.windSpeed} м/с&lt;/p>
+                &lt;/div>
+            )}
+
+            {hourlyForecast.length > 0 &amp;&amp; (
+                &lt;div className="forecast-info">
+                    &lt;h2>Прогноз на наступні 9 годин&lt;/h2>
+                    &lt;div className="chart-container">
+                        &lt;Line data={getChartData()} />
+                    &lt;/div>
+                &lt;/div>
+            )}
+
+            {forecast &amp;&amp; (
+                &lt;div className="forecast-info">
+                    &lt;h2>Прогноз на 5 днів&lt;/h2>
+                    &lt;div className="daily-forecast">
+                        {forecast.map((item, index) => (
+                            &lt;div key={index} className="day">
+                                &lt;p>{item.date}&lt;/p>
+                                &lt;img
+                                    src={`http://openweathermap.org/img/wn/${item.icon}@2x.png`}
+                                    alt={item.description}
+                                />
+                                &lt;p>Температура: {item.temperature}°C&lt;/p>
+                                &lt;p>Опис: {item.description}&lt;/p>
+                            &lt;/div>
+                        ))}
+                    &lt;/div>
+                &lt;/div>
+            )}
+
+            &lt;button
+                onClick={handlePrivacyPolicyClick}
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    right: "20px",
+                    padding: "10px 20px",
+                    background: "#2B373B",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                }}
+            >
+                Переглянути політику конфіденційності
+            &lt;/button>
+
+            &lt;button
+                onClick={handleUpdateCookiesClick}
+                style={{
+                    position: "fixed",
+                    bottom: "70px",
+                    right: "20px",
+                    padding: "10px 20px",
+                    background: "#2B373B",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                }}
+            >
+                Оновити налаштування кукі
+            &lt;/button>
+        &lt;/div>
+    );
+};
+
+export default WeatherDashboard;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#WeatherDashboard">WeatherDashboard</a></li><li><a href="global.html#fetchWeather">fetchWeather</a></li><li><a href="global.html#getChartData">getChartData</a></li><li><a href="global.html#handleKeyPress">handleKeyPress</a></li><li><a href="global.html#handlePrivacyPolicyClick">handlePrivacyPolicyClick</a></li><li><a href="global.html#handleUpdateCookiesClick">handleUpdateCookiesClick</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Feb 28 2025 12:51:46 GMT+0200 (за східноєвропейським стандартним часом)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
