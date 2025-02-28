@@ -73,3 +73,8 @@ Email:
 ```
 ipz224_ddo@student.ztu.edu.ua
 ```
+## Посилання
+
+- [Storybook](Weather_Dashboard/src/stories/ForecastChart.stories.jsx)
+- [JSDoc](Weather_Dashboard/docs/index.html)
+- [Swagger API](Weather_Dashboard/server/swagger.json)
